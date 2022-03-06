@@ -17,6 +17,8 @@ jobs:
           - nightly
     steps:
       - uses: actions/checkout@v2
+      - name: update apt & upgrade
+        run: sudo apt update --yes && sudo apt upgrade --yes
       - name: install ffmpeg dev libs
         # /usr/bin/ld: cannot find -lraw1394
         # /usr/bin/ld: cannot find -lavc1394
