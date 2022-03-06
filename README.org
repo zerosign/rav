@@ -12,7 +12,7 @@ doing something or not or being success or not, it doesn't matter, what matters 
 explore the design space of it and might create another library from scratches that resemble
 better architecture natively in Rust.
 
-*NOTE*: Most of you might want to take a look to [[docs.rs/gstreamer][gstreamer-rs]] initiative instead if you want to have
+*NOTE*: Most of you might want to take a look to [[https://docs.rs/gstreamer][gstreamer-rs]] initiative instead if you want to have
 full high level pipeline that you could easily customize.
 
 *NOTE*: The status of this crates are so far from done. I'm still exploring design space of
