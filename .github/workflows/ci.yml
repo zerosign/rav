@@ -17,11 +17,18 @@ jobs:
           - nightly
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          apt install --yes libavcodec-dev libavdevice-dev libavfilter-dev \
-                            libavformat-dev libavutil-dev libpostproc-dev \
-                            libswresample-dev libswscale-dev
 
-      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-      - run: cargo build --verbose
-      - run: cargo test --verbose
+      - name: install ffmpeg dev libs
+        run: |
+          sudo apt install --yes libavcodec-dev libavdevice-dev libavfilter-dev \
+                                 libavformat-dev libavutil-dev libpostproc-dev \
+                                 libswresample-dev libswscale-dev
+
+      - name: setup rustup toolchain
+        run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+
+      - name: build crates
+        run: cargo build --verbose
+
+      - name: test crates
+        run: cargo test --verbose
