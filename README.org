@@ -1,0 +1,45 @@
+* rav
+
+** Overview
+
+*rav* is (wannabe) minimilized safe wrapper around *ffmpeg-sys-next* as an alternative library
+to be used. The goal was to understand *ffmpeg* better and take a notes on overall architecture
+in *ffmpeg* library. It might be some caveats or some edge cases. We also could take a look on
+how most multimedia library are being abstracted in low level (around codec, container, transport
+/ I/O, pipeline, etc), however, we took top down approach since we want to take a look on
+how *ffmpeg* are being used to model all those stuffs including the pipeline. Whether this crates
+doing something or not or being success or not, it doesn't matter, what matters is that I could
+explore the design space of it and might create another library from scratches that resemble
+better architecture natively in Rust.
+
+*NOTE*: Most of you might want to take a look to [[docs.rs/gstreamer][gstreamer-rs]] initiative instead if you want to have
+full high level pipeline that you could easily customize.
+
+*NOTE*: The status of this crates are so far from done. I'm still exploring design space of
+*ffmpeg* and how it converges into. So, expect *bugs*, *incomplete wrapper*, *useless codes* &
+*huge refactoring* along the way.
+
+** Development
+
+*** Dependencies
+
+- ffmpeg 5.x
+- Rust (nightly), no MSRV yet.
+
+*** Exploration
+
+- [TODO] Currently, ffmpeg are being built on top assumption of I/O are mostly non-async. That
+  includes the entire pipeline of it. How do we mitigate this if we want to use async I/O runtime
+  like *tokio* for it's *AVIOContext* ?
+
+- [TODO] Some function are being re-implemented because of some high level function in C are kinda
+  bit problematic, how much parts in C that want to be re-implemented ? Current assumptions are
+  only for high level parts but not any from *AVClass*
+
+- ...
+
+*** Notes
+
+- Any quirk implementation in C & any assumption on those implementation or re-implementation must
+  be noted in comment sections in the code, so that people could take a look on why it's being
+  re-implemented or suggest any changes or argue about design spaces later on.
