@@ -94,16 +94,16 @@ jobs:
                                  libavformat-dev libavutil-dev libpostproc-dev \
                                  libswresample-dev libswscale-dev \
                                  libraw1394-dev libavc1394-dev \
-                                 librom1394-dev libiec61883-dev \
+                                 libiec61883-dev \
                                  libjack-dev libopenal-dev \
                                  libxcb-shape0-dev libxcb-xfixes0-dev \
-                                 libcdio_paranoia-dev libcdio-paranoia-dev \
+                                 libcdio-paranoia-dev libcdio-paranoia-dev \
                                  libdc1394-22-dev libasound-dev \
                                  libcaca-dev libpulse-dev \
                                  libsndio-dev libogg-dev \
-                                 libvorbis-dev libvorbisenc-dev libwavpack-dev \
+                                 libvorbis-dev libwavpack-dev \
                                  libwebp-dev libx264-dev libx265-dev libxvidcore-dev \
-                                 libsnappy-dev libaom-dev libwebpmux-dev libopus-dev \
+                                 libsnappy-dev libaom-dev libwebpmux3 libopus-dev \
                                  libspeex-dev libtheora-dev libczmq-dev libopenmpt-dev
 
       - name: setup rustup toolchain
