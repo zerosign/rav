@@ -333,15 +333,15 @@ impl UnsafeRegistry {
 	 //
 	 // list all demuxers by using iterator
 	 //
-	 pub fn demuxers() -> Result<impl Iterator<Item = NonNull<AVInputFormat>>, ()> {
-		  Ok(UnsafeDemuxerIterator::new())
+	 pub fn demuxers() -> impl Iterator<Item = NonNull<AVInputFormat>> {
+		  UnsafeDemuxerIterator::new()
 	 }
 
 	 //
 	 // list all muxers by using iterator
 	 //
-	 pub fn muxers() -> Result<impl Iterator<Item = NonNull<AVOutputFormat>>, ()> {
-		  Ok(UnsafeMuxerIterator::new())
+	 pub fn muxers() -> impl Iterator<Item = NonNull<AVOutputFormat>> {
+		  UnsafeMuxerIterator::new()
 	 }
 }
 
@@ -354,11 +354,8 @@ mod test_unsafe_registries {
 	 fn test_registry_list_demuxers() {
 
 		  let mut demuxer_counter = 0;
-		  let iterator = UnsafeRegistry::demuxers();
 
-		  assert!(iterator.is_ok(), "iterator fails to iterate all available demuxers");
-
-		  for _ in iterator.unwrap() {
+		  for _ in UnsafeRegistry::demuxers() {
 				// since it's nonnull then we don't need to check whether ptr is correct or not
 				demuxer_counter += 1;
 		  }
@@ -371,11 +368,7 @@ mod test_unsafe_registries {
 
 		  let mut muxer_counter = 0;
 
-		  let iterator = UnsafeRegistry::muxers();
-
-		  assert!(iterator.is_ok(), "iterator fails to iterate all available muxers");
-
-		  for _ in iterator.unwrap() {
+		  for _ in UnsafeRegistry::muxers() {
 				// since it's nonnull then we don't need to check whether ptr is correct or not
 				muxer_counter += 1;
 		  }
