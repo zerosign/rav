@@ -6,7 +6,7 @@ use ffmpeg_sys_next as ffmpeg;
 use ffmpeg::{
     avcodec_get_class, avformat_alloc_context, avformat_alloc_output_context2,
     avformat_close_input, avformat_free_context, avformat_get_class, avformat_open_input,
-	 avio_close, av_demuxer_iterate,
+	 avio_close, av_demuxer_iterate, av_muxer_iterate, AVOutputFormat,
     AVFormatContext, AVProbeData, AVFMT_FLAG_CUSTOM_IO, AVFMT_NOFILE, AVClassCategory, AVInputFormat,
 };
 use thiserror::Error;
@@ -118,6 +118,10 @@ const fn ff_id3v2_eq<'a, 'b>(bytes: &'a [u8], magic: &'b [u8]) -> bool {
 // NOTE: I honestly think ffmpeg impl ff_Id3v2_tag_len has a bug since
 // u8 <= 8 bits, yet we shift left up to 21 & 14 bits.
 //
+//
+// NOTE: we might need to re-implement this by
+// https://id3.org/id3v2.3.0
+//
 #[inline]
 const fn ff_id3v2_tag_len<'a>(bytes: &'a [u8]) -> usize {
 
@@ -171,6 +175,78 @@ const fn ff_id3v2_tag_len<'a>(bytes: &'a [u8]) -> usize {
 //
 pub struct UnsafeRegistry {}
 
+pub struct UnsafeMuxerIterator {
+	 inner: * mut c_void,
+}
+
+impl UnsafeMuxerIterator {
+	 // Initialize muxer iterator
+	 //
+	 // NOTE: av_*_iterate are based on `ill` assumption that
+	 // in C NULL always point to address `0`. Thus, we need to
+	 // initialize the `opaque` ptr into `null`.
+	 //
+	 const fn new() -> Self {
+		  UnsafeMuxerIterator {
+				inner: ptr::null_mut(),
+		  }
+	 }
+}
+
+
+// NOTE: since we're using raw ptr we need to implement
+//       our own Drop impl.
+//
+impl Drop for UnsafeMuxerIterator {
+	 fn drop(&mut self) {
+		  unsafe { ptr::drop_in_place(self.inner) }
+	 }
+}
+
+
+impl Iterator for UnsafeMuxerIterator {
+	 type Item = NonNull<AVOutputFormat>;
+
+	 //
+	 // opaque default value = NULL or uninitialized.
+	 //
+	 // static atomic_uintptr_t outdev_list_intptr  = ATOMIC_VAR_INIT(0);
+	 //
+	 // hhttps://github.com/FFmpeg/FFmpeg/blob/master/libavformat/allformats.c#L545-L562
+	 //
+	 // const AVOutputFormat *av_muxer_iterate(void **opaque)
+	 // {
+	 //     static const uintptr_t size = sizeof(muxer_list)/sizeof(muxer_list[0]) - 1;
+	 //     uintptr_t i = (uintptr_t)*opaque;
+	 //     const AVOutputFormat *f = NULL;
+	 //     uintptr_t tmp;
+	 //
+	 //     if (i < size) {
+	 //         f = muxer_list[i];
+	 //     } else if (tmp = atomic_load_explicit(&outdev_list_intptr, memory_order_relaxed)) {
+	 //         const AVOutputFormat *const *outdev_list = (const AVOutputFormat *const *)tmp;
+	 //         f = outdev_list[i - size];
+	 //     }
+	 //
+	 //     if (f)
+	 //         *opaque = (void*)(i + 1);
+	 //     return f;
+	 // }
+	 //
+	 // Note: since *_list are static privately defined, we can't do anything about this behavior until
+	 // it's being fixed upstream or we fix it ourself in ffmpeg library or fork it.
+	 //
+	 fn next(&mut self) -> Option<Self::Item> {
+
+		  // TODO: need to check this (ptr -> mut ptr).
+		  let format = unsafe {
+				av_muxer_iterate(&mut self.inner)
+		  };
+
+		  NonNull::new(format.as_mut())
+    }
+}
+
 //
 // NOTE: this is unsafe iterator since everybody at runtime could invalidate
 // ptr in static array without blocking or invalidating the iterator.
@@ -188,7 +264,7 @@ impl UnsafeDemuxerIterator {
 	 // in C NULL always point to address `0`. Thus, we need to
 	 // initialize the `opaque` ptr into `null`.
 	 //
-	 const fn new() -> UnsafeDemuxerIterator {
+	 const fn new() -> Self {
 		  UnsafeDemuxerIterator {
 				inner: ptr::null_mut(),
 		  }
@@ -239,7 +315,7 @@ impl Iterator for UnsafeDemuxerIterator {
 	 //     return f;
 	 // }
 	 //
-	 // Note: since *_list are staticly defined, we can't do anything about this behavior until
+	 // Note: since *_list are static privately defined, we can't do anything about this behavior until
 	 // it's being fixed upstream or we fix it ourself in ffmpeg library or fork it.
 	 //
 	 fn next(&mut self) -> Option<Self::Item> {
@@ -255,27 +331,56 @@ impl Iterator for UnsafeDemuxerIterator {
 
 impl UnsafeRegistry {
 	 //
-	 // list all demuxer by using iterator
+	 // list all demuxers by using iterator
 	 //
 	 pub fn demuxers() -> Result<impl Iterator<Item = NonNull<AVInputFormat>>, ()> {
 		  Ok(UnsafeDemuxerIterator::new())
 	 }
+
+	 //
+	 // list all muxers by using iterator
+	 //
+	 pub fn muxers() -> Result<impl Iterator<Item = NonNull<AVOutputFormat>>, ()> {
+		  Ok(UnsafeMuxerIterator::new())
+	 }
 }
 
-#[cfg(tests)]
-mod tests {
+#[cfg(test)]
+mod test_unsafe_registries {
+
+	 use super::UnsafeRegistry;
 
 	 #[test]
 	 fn test_registry_list_demuxers() {
 
 		  let mut demuxer_counter = 0;
+		  let iterator = UnsafeRegistry::demuxers();
 
-		  for demuxer in UnsafeRegistry::demuxers() {
-				assert!(demuxer.is_some(), "demuxer not available");
+		  assert!(iterator.is_ok(), "iterator fails to iterate all available demuxers");
+
+		  for _ in iterator.unwrap() {
+				// since it's nonnull then we don't need to check whether ptr is correct or not
 				demuxer_counter += 1;
 		  }
 
 		  assert_ne!(demuxer_counter, 0, "demuxer should be available");
+	 }
+
+	 #[test]
+	 fn test_registry_list_muxers() {
+
+		  let mut muxer_counter = 0;
+
+		  let iterator = UnsafeRegistry::muxers();
+
+		  assert!(iterator.is_ok(), "iterator fails to iterate all available muxers");
+
+		  for _ in iterator.unwrap() {
+				// since it's nonnull then we don't need to check whether ptr is correct or not
+				muxer_counter += 1;
+		  }
+
+		  assert_ne!(muxer_counter, 0, "muxer should be available");
 	 }
 }
 
