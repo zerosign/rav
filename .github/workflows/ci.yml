@@ -20,44 +20,6 @@ jobs:
       - name: update apt & upgrade
         run: sudo apt update --yes && sudo apt upgrade --yes
       - name: install ffmpeg dev libs
-        #   /usr/bin/ld: cannot find -lGL
-        #   /usr/bin/ld: cannot find -lSDL2
-        #   /usr/bin/ld: cannot find -lbs2b
-        #   /usr/bin/ld: cannot find -llilv-0
-        #   /usr/bin/ld: cannot find -lsratom-0
-        #   /usr/bin/ld: cannot find -lsord-0
-        #   /usr/bin/ld: cannot find -lserd-0
-        #   /usr/bin/ld: cannot find -lrubberband
-        #   /usr/bin/ld: cannot find -lmysofa
-        #   /usr/bin/ld: cannot find -lflite_cmu_time_awb
-        #   /usr/bin/ld: cannot find -lflite_cmu_us_awb
-        #   /usr/bin/ld: cannot find -lflite_cmu_us_kal
-        #   /usr/bin/ld: cannot find -lflite_cmu_us_kal16
-        #   /usr/bin/ld: cannot find -lflite_cmu_us_rms
-        #   /usr/bin/ld: cannot find -lflite_cmu_us_slt
-        #   /usr/bin/ld: cannot find -lflite_usenglish
-        #   /usr/bin/ld: cannot find -lflite_cmulex
-        #   /usr/bin/ld: cannot find -lflite
-        #   /usr/bin/ld: cannot find -lfribidi
-        #   /usr/bin/ld: cannot find -lass
-        #   /usr/bin/ld: cannot find -lvidstab
-        #   /usr/bin/ld: cannot find -lgme
-        #   /usr/bin/ld: cannot find -lchromaprint
-        #   /usr/bin/ld: cannot find -lbluray
-        #   /usr/bin/ld: cannot find -lgnutls
-        #   /usr/bin/ld: cannot find -lssh
-        #   /usr/bin/ld: cannot find -lvpx
-        #   /usr/bin/ld: cannot find -lzvbi
-        #   /usr/bin/ld: cannot find -lcodec2
-        #   /usr/bin/ld: cannot find -lgsm
-        #   /usr/bin/ld: cannot find -lmp3lame
-        #   /usr/bin/ld: cannot find -lopenjp2
-        #   /usr/bin/ld: cannot find -lshine
-        #   /usr/bin/ld: cannot find -ltwolame
-        #   /usr/bin/ld: cannot find -lsoxr
-        #   /usr/bin/ld: cannot find -lva-drm
-        #   /usr/bin/ld: cannot find -lva-x11
-        #   /usr/bin/ld: cannot find -lvdpau
         run: |
           sudo apt install --yes libavcodec-dev libavdevice-dev libavfilter-dev \
                                  libavformat-dev libavutil-dev libpostproc-dev \
@@ -73,7 +35,16 @@ jobs:
                                  libvorbis-dev libwavpack-dev \
                                  libwebp-dev libx264-dev libx265-dev libxvidcore-dev \
                                  libsnappy-dev libaom-dev libwebpmux3 libopus-dev \
-                                 libspeex-dev libtheora-dev libczmq-dev libopenmpt-dev
+                                 libspeex-dev libtheora-dev libczmq-dev libopenmpt-dev \
+                                 libva-drm2 libsoxr-dev libtwolame-dev \
+                                 libva-x11-2 libshine-dev libopenjp2-7-dev \
+                                 libmp3lame-dev libgsm1-dev libcodec2-dev \
+                                 libzvbi-dev libvpx-dev libssh-dev \
+                                 libgnutls28-dev libbluray-dev libchromaprint-dev \
+                                 libgme-dev libvidstab-dev libass-dev libfribidi-dev \
+                                 libflite1 libmysofa-dev librubberband-dev \
+                                 libserd-dev libsord-dev libsratom-dev liblilv-dev \
+                                 libbs2b-dev libsdl2-dev libgl-dev
 
       - name: setup rustup toolchain
         run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
