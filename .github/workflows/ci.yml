@@ -17,8 +17,6 @@ jobs:
           - nightly
     steps:
       - uses: actions/checkout@v2
-      - name: update apt & upgrade
-        run: sudo apt update --yes && sudo apt upgrade --yes
       - name: install ffmpeg dev libs
         run: |
           sudo apt install --yes libavcodec-dev libavdevice-dev libavfilter-dev \
