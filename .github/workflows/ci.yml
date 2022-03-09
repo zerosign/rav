@@ -17,9 +17,9 @@ jobs:
           - nightly
     steps:
       - uses: actions/checkout@v2
-      - name: update apt
-        run: |
-          sudo apt update --yes && sudo apt upgrade --yes
+      # - name: update apt
+      #   run: |
+      #     sudo apt update --yes && sudo apt upgrade --yes
       - name: install ffmpeg dev libs
         run: |
           sudo apt install --yes libavcodec-dev libavdevice-dev libavfilter-dev \
@@ -28,26 +28,15 @@ jobs:
                                  libraw1394-dev libavc1394-dev \
                                  libiec61883-dev \
                                  libjack-dev libopenal-dev \
-                                 libxcb-shape0-dev libxcb-xfixes0-dev \
-                                 libcdio-paranoia-dev libcdio-paranoia-dev \
                                  libdc1394-22-dev libasound-dev \
-                                 libcaca-dev libpulse-dev \
                                  libsndio-dev libogg-dev \
                                  libvorbis-dev libwavpack-dev \
-                                 libwebp-dev libx264-dev libx265-dev libxvidcore-dev \
+                                 libwebp-dev libx264-dev libx265-dev \
                                  libsnappy-dev libaom-dev libwebpmux3 libopus-dev \
                                  libspeex-dev libtheora-dev libczmq-dev libopenmpt-dev \
-                                 libva-drm2 libsoxr-dev libtwolame-dev \
-                                 libva-x11-2 libshine-dev libopenjp2-7-dev \
-                                 libmp3lame-dev libgsm1-dev libcodec2-dev \
-                                 libzvbi-dev libvpx-dev libssh-dev \
-                                 libgnutls28-dev libbluray-dev libchromaprint-dev \
-                                 libgme-dev libvidstab-dev libass-dev libfribidi-dev \
-                                 libflite1 libmysofa-dev librubberband-dev \
-                                 libserd-dev libsord-dev libsratom-dev liblilv-dev \
-                                 libbs2b-dev libsdl2-dev libgl-dev libvdpau-dev \
-                                 libva-x11-2 libva-drm2 flite1-dev
-
+                                 libsoxr-dev libtwolame-dev \
+                                 libshine-dev libopenjp2-7-dev \
+                                 libmp3lame-dev libgsm1-dev libcodec2-dev libvpx-dev
 
       - name: setup rustup toolchain
         run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
