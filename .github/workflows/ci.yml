@@ -42,7 +42,9 @@ jobs:
                                  libgme-dev libvidstab-dev libass-dev libfribidi-dev \
                                  libflite1 libmysofa-dev librubberband-dev \
                                  libserd-dev libsord-dev libsratom-dev liblilv-dev \
-                                 libbs2b-dev libsdl2-dev libgl-dev
+                                 libbs2b-dev libsdl2-dev libgl-dev libvdpau-dev \
+                                 libva-x11-2 libva-drm2 flite1-dev
+
 
       - name: setup rustup toolchain
         run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
