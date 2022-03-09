@@ -6,7 +6,8 @@ use ffmpeg_sys_next as ffmpeg;
 use ffmpeg::{
     avcodec_get_class, avformat_alloc_context, avformat_alloc_output_context2,
     avformat_close_input, avformat_free_context, avformat_get_class, avformat_open_input,
-    AVFormatContext, AVProbeData, AVFMT_FLAG_CUSTOM_IO, AVFMT_NOFILE, AVClassCategory, avio_close, av_demuxer_iterate, AVInputFormat,
+	 avio_close, av_demuxer_iterate,
+    AVFormatContext, AVProbeData, AVFMT_FLAG_CUSTOM_IO, AVFMT_NOFILE, AVClassCategory, AVInputFormat,
 };
 use thiserror::Error;
 use std::{ffi::{c_void, CString, CStr, NulError}, fmt, path::Path, ptr::{self, NonNull, drop_in_place}};
@@ -15,7 +16,7 @@ use std::{ffi::{c_void, CString, CStr, NulError}, fmt, path::Path, ptr::{self, N
 //
 // - need to add test with libasan, memsan enabled in Cargo.toml
 //   partially because we don't quite trust exposed Public ffmpeg API.
-
+//
 // Functions that need to be looked at
 //
 // - avformat_open_input
@@ -36,18 +37,16 @@ use std::{ffi::{c_void, CString, CStr, NulError}, fmt, path::Path, ptr::{self, N
 // - av_buffersink_get_frame
 // - av_write_trailer
 //
-
+//
 // The entrypoint for input could be from
 // - av_file_map
-//
-//
 // - avformat_open_input
 //
-
+//
 // NOTE: av_free doesn't age well :')
 //
 // https://sourcegraph.com/github.com/FFmpeg/FFmpeg@1a502b99e818ee7b8b2b56c4f5c27e31f674c555/-/blob/libavutil/mem.c?L246-262
-
+//
 // AVClass is an arbitary abstract inheritance model in ffmpeg
 // Tree kind a structure since AVClass can embed itself.
 //
@@ -66,7 +65,6 @@ use std::{ffi::{c_void, CString, CStr, NulError}, fmt, path::Path, ptr::{self, N
 //
 // - https://sourcegraph.com/github.com/FFmpeg/FFmpeg@1a502b99e818ee7b8b2b56c4f5c27e31f674c555/-/blob/libavutil/log.h?L28-47
 //
-
 #[inline]
 fn is_input_device(category: AVClassCategory) -> bool {
 	 category == AVClassCategory::AV_CLASS_CATEGORY_DEVICE_VIDEO_INPUT ||

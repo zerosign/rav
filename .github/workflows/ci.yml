@@ -2,6 +2,8 @@ name: Cargo Build & Test
 
 on:
   push:
+    branches:
+      - master
   pull_request:
 
 env:
@@ -17,12 +19,26 @@ jobs:
           - nightly
     steps:
       - uses: actions/checkout@v2
-
+      # - name: update apt
+      #   run: |
+      #     sudo apt update --yes && sudo apt upgrade --yes
       - name: install ffmpeg dev libs
         run: |
           sudo apt install --yes libavcodec-dev libavdevice-dev libavfilter-dev \
                                  libavformat-dev libavutil-dev libpostproc-dev \
-                                 libswresample-dev libswscale-dev
+                                 libswresample-dev libswscale-dev \
+                                 libraw1394-dev libavc1394-dev \
+                                 libiec61883-dev \
+                                 libjack-dev libopenal-dev \
+                                 libdc1394-22-dev libasound-dev \
+                                 libsndio-dev libogg-dev \
+                                 libvorbis-dev libwavpack-dev \
+                                 libwebp-dev libx264-dev libx265-dev \
+                                 libsnappy-dev libaom-dev libwebpmux3 libopus-dev \
+                                 libspeex-dev libtheora-dev libczmq-dev libopenmpt-dev \
+                                 libsoxr-dev libtwolame-dev \
+                                 libshine-dev libopenjp2-7-dev \
+                                 libmp3lame-dev libgsm1-dev libcodec2-dev libvpx-dev
 
       - name: setup rustup toolchain
         run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
