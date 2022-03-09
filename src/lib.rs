@@ -2,16 +2,10 @@
 
 use env_logger;
 use ffmpeg::{
-<<<<<<< HEAD
     avcodec_get_class, avformat_alloc_context, avformat_alloc_output_context2,
     avformat_close_input, avformat_free_context, avformat_get_class, avformat_open_input,
 	 avio_close, av_demuxer_iterate, av_muxer_iterate, AVOutputFormat,
     AVFormatContext, AVProbeData, AVFMT_FLAG_CUSTOM_IO, AVFMT_NOFILE, AVClassCategory, AVInputFormat,
-=======
-    av_demuxer_iterate, av_muxer_iterate, avcodec_get_class, avformat_alloc_context,
-    avformat_alloc_output_context2, avformat_close_input, avformat_free_context,
-    avformat_get_class, avformat_open_input, avio_close, AVClassCategory, AVFormatContext,
-    AVInputFormat, AVOutputFormat, AVProbeData, AVFMT_FLAG_CUSTOM_IO, AVFMT_NOFILE,
 };
 use ffmpeg_sys_next as ffmpeg;
 use log::debug;
@@ -20,7 +14,6 @@ use std::{
     fmt,
     path::Path,
     ptr::{self, drop_in_place, NonNull},
->>>>>>> 87c22f8 (feat: implement demuxer & muxer iterator)
 };
 use thiserror::Error;
 
@@ -92,7 +85,7 @@ fn is_output_device(category: AVClassCategory) -> bool {
 }
 
 const ID3V2_HEADER_SIZE: usize = 10;
-const ID3V2_DEFAULT_MAGIC: &'static [u8] = "ID3";
+const ID3V2_DEFAULT_MAGIC: &'static [u8] = b"ID3";
 
 //
 // bytes size > 10 (it needs at least 10 bytes)
@@ -419,7 +412,7 @@ fn probe_input_format<'a>(bytes: &'a [u8], max: u64) {
     //     } else
     //         nodat = ID3_GREATER_PROBE;
     // }
-    if ff_id3v2_eq(&bytes[0..10], ID3v2_DEFAULT_MAGIC) {
+    if ff_id3v2_eq(&bytes[0..10], ID3V2_DEFAULT_MAGIC) {
         // tag length
         let tag_len = ff_id3v2_tag_len(&bytes[0..10]);
     }
